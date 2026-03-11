@@ -2,6 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
+/* React Calendar Styles */
 .react-calendar {
   width: 100% !important;
   border: none !important;
@@ -10,20 +11,40 @@
 
 .react-calendar__navigation__label__labelText {
   font-weight: 600;
+  color: #4B5563;
 }
 
 .react-calendar__tile--active {
-  background-color: #c3ebfa !important;
-  color: black !important;
+  background-color: #C3EBFA !important;
+  color: #1F2937 !important;
+  border-radius: 6px;
 }
 
+.react-calendar__tile--now {
+  background-color: #F3E8FF !important;
+  border-radius: 6px;
+}
+
+.react-calendar__tile:hover {
+  background-color: #EDE9FE !important;
+  border-radius: 6px;
+}
+
+/* Big Calendar Styles */
 .rbc-btn-group:first-child {
   display: none !important;
+}
+
+.rbc-toolbar {
+  margin-bottom: 20px !important;
 }
 
 .rbc-toolbar-label {
   text-align: right !important;
   padding: 0px 20px !important;
+  font-weight: 600;
+  color: #4B5563;
+  font-size: 1.25rem;
 }
 
 .rbc-btn-group:last-child {
@@ -32,17 +53,29 @@
 
 .rbc-btn-group:last-child button {
   border: none !important;
-  background-color: #f1f0ff !important;
+  background-color: #F3F4F6 !important;
   margin-left: 2px !important;
+  color: #4B5563 !important;
+  padding: 6px 12px !important;
+  border-radius: 6px !important;
+  transition: all 0.2s ease;
+}
+
+.rbc-btn-group:last-child button:hover {
+  background-color: #7C3AED !important;
+  color: white !important;
 }
 
 .rbc-toolbar button.rbc-active {
-  background-color: #dbdafe !important;
+  background-color: #7C3AED !important;
+  color: white !important;
   box-shadow: none !important;
 }
 
 .rbc-time-view {
-  border-color: #eee !important;
+  border-color: #E5E7EB !important;
+  border-radius: 8px !important;
+  overflow: hidden;
 }
 
 .rbc-time-header {
@@ -62,47 +95,201 @@
 }
 
 .rbc-timeslot-group {
-  background-color: #f7fdff !important;
+  background-color: #FAF5FF !important;
+  border-color: #E5E7EB !important;
 }
 
 .rbc-day-slot {
   font-size: 14px !important;
 }
 
+.rbc-day-slot .rbc-events-container {
+  margin-right: 0 !important;
+}
+
 .rbc-event {
   border: none !important;
-  color: black !important;
-  padding: 10px !important;
-  margin: 10px !important;
-  width: 99% !important;
+  color: #1F2937 !important;
+  padding: 8px !important;
+  margin: 4px !important;
+  width: calc(100% - 8px) !important;
+  border-radius: 6px !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05) !important;
+  transition: transform 0.2s ease;
 }
 
-.rbc-event:nth-child(1) {
-  background-color: #e2f8ff !important;
-}
-.rbc-event:nth-child(2) {
-  background-color: #fefce8 !important;
-}
-.rbc-event:nth-child(3) {
-  background-color: #f2f1ff !important;
-}
-.rbc-event:nth-child(4) {
-  background-color: #fdf2fb !important;
-}
-.rbc-event:nth-child(5) {
-  background-color: #e2f8ff !important;
-}
-.rbc-event:nth-child(6) {
-  background-color: #fefce8 !important;
-}
-.rbc-event:nth-child(7) {
-  background-color: #f2f1ff !important;
-}
-.rbc-event:nth-child(8) {
-  background-color: #fdf2fb !important;
+.rbc-event:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(124, 58, 237, 0.1) !important;
 }
 
-.rbc-event-label{
-  color: gray !important;
-  margin-bottom: 5px;
+/* Church event type colors */
+.rbc-event.sunday-service {
+  background-color: #F3E8FF !important;
+  border-left: 4px solid #7C3AED !important;
+}
+
+.rbc-event.bible-study {
+  background-color: #DBEAFE !important;
+  border-left: 4px solid #3B82F6 !important;
+}
+
+.rbc-event.prayer-meeting {
+  background-color: #DCFCE7 !important;
+  border-left: 4px solid #22C55E !important;
+}
+
+.rbc-event.cell-meeting {
+  background-color: #FEF9C3 !important;
+  border-left: 4px solid #EAB308 !important;
+}
+
+.rbc-event.conference {
+  background-color: #FFEDD5 !important;
+  border-left: 4px solid #F97316 !important;
+}
+
+.rbc-event.outreach {
+  background-color: #FCE7F3 !important;
+  border-left: 4px solid #EC4899 !important;
+}
+
+.rbc-event.wedding {
+  background-color: #FCE7F3 !important;
+  border-left: 4px solid #DB2777 !important;
+}
+
+.rbc-event.baptism {
+  background-color: #CFFAFE !important;
+  border-left: 4px solid #06B6D4 !important;
+}
+
+.rbc-event.prayer-request {
+  background-color: #E0E7FF !important;
+  border-left: 4px solid #6366F1 !important;
+}
+
+.rbc-event.default-event {
+  background-color: #F3F4F6 !important;
+  border-left: 4px solid #9CA3AF !important;
+}
+
+.rbc-event-label {
+  color: #6B7280 !important;
+  margin-bottom: 4px;
+  font-size: 11px !important;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.rbc-current-time-indicator {
+  background-color: #7C3AED !important;
+  height: 2px !important;
+}
+
+.rbc-day-bg.rbc-today {
+  background-color: #F3E8FF !important;
+}
+
+/* Sunday highlighting */
+.rbc-day-bg.sunday {
+  background-color: #FEF9C3 !important;
+}
+
+/* Custom church calendar classes */
+.church-calendar .rbc-month-view {
+  border-color: #E5E7EB !important;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.church-calendar .rbc-month-header {
+  background-color: #F9FAFB;
+}
+
+.church-calendar .rbc-header {
+  padding: 12px !important;
+  font-weight: 600;
+  color: #4B5563;
+  border-bottom: 2px solid #E5E7EB !important;
+}
+
+.church-calendar .rbc-date-cell {
+  padding: 8px !important;
+  font-weight: 500;
+}
+
+.church-calendar .rbc-off-range-bg {
+  background-color: #F9FAFB !important;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #F3F4F6;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #7C3AED;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #6D28D9;
+}
+
+/* Church card styles */
+.church-card {
+  @apply bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow border border-gray-100;
+}
+
+.church-card-header {
+  @apply p-4 border-b border-gray-100 font-semibold text-gray-700;
+}
+
+.church-card-body {
+  @apply p-4;
+}
+
+/* Status badges */
+.status-badge {
+  @apply px-2 py-1 rounded-full text-xs font-medium;
+}
+
+.status-badge.active {
+  @apply bg-green-100 text-green-700;
+}
+
+.status-badge.inactive {
+  @apply bg-gray-100 text-gray-700;
+}
+
+.status-badge.pending {
+  @apply bg-yellow-100 text-yellow-700;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .rbc-toolbar {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .rbc-toolbar-label {
+    text-align: center !important;
+    padding: 10px !important;
+  }
+  
+  .rbc-btn-group:last-child {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
 }
