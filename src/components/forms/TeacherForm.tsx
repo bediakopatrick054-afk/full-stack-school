@@ -5,14 +5,14 @@ import { useForm } from "react-hook-form";
 import InputField from "../InputField";
 import Image from "next/image";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { teacherSchema, TeacherSchema } from "@/lib/formValidationSchemas";
+import { pastorSchema, PastorSchema } from "@/lib/formValidationSchemas";
 import { useFormState } from "react-dom";
-import { createTeacher, updateTeacher } from "@/lib/actions";
+import { createPastor, updatePastor } from "@/lib/actions";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { CldUploadWidget } from "next-cloudinary";
 
-const TeacherForm = ({
+const PastorForm = ({
   type,
   data,
   setOpen,
@@ -27,14 +27,14 @@ const TeacherForm = ({
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<TeacherSchema>({
-    resolver: zodResolver(teacherSchema),
+  } = useForm<PastorSchema>({
+    resolver: zodResolver(pastorSchema),
   });
 
   const [img, setImg] = useState<any>();
 
   const [state, formAction] = useFormState(
-    type === "create" ? createTeacher : updateTeacher,
+    type === "create" ? createPastor : updatePastor,
     {
       success: false,
       error: false,
@@ -42,7 +42,7 @@ const TeacherForm = ({
   );
 
   const onSubmit = handleSubmit((data) => {
-    console.log(data);
+    console.log("Submitting pastor data:", data);
     formAction({ ...data, img: img?.secure_url });
   });
 
@@ -50,36 +50,49 @@ const TeacherForm = ({
 
   useEffect(() => {
     if (state.success) {
-      toast(`Teacher has been ${type === "create" ? "created" : "updated"}!`);
+      toast.success(`Pastor has been ${type === "create" ? "added" : "updated"}!`);
       setOpen(false);
       router.refresh();
     }
   }, [state, router, type, setOpen]);
 
-  const { subjects } = relatedData;
+  const { ministries, cellGroups } = relatedData;
+
+  // Ordination years for dropdown
+  const currentYear = new Date().getFullYear();
+  const ordinationYears = Array.from({ length: 50 }, (_, i) => currentYear - i);
 
   return (
-    <form className="flex flex-col gap-8" onSubmit={onSubmit}>
-      <h1 className="text-xl font-semibold">
-        {type === "create" ? "Create a new teacher" : "Update the teacher"}
+    <form className="flex flex-col gap-6 p-4" onSubmit={onSubmit}>
+      <h1 className="text-xl font-semibold text-gray-700 border-b pb-2">
+        {type === "create" ? "Add New Pastor" : "Update Pastor Information"}
       </h1>
-      <span className="text-xs text-gray-400 font-medium">
-        Authentication Information
-      </span>
-      <div className="flex justify-between flex-wrap gap-4">
+
+      {/* Authentication Information */}
+      <div>
+        <span className="text-xs font-semibold text-purple-600 bg-purple-50 px-2 py-1 rounded">
+          Account Information
+        </span>
+      </div>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <InputField
           label="Username"
           name="username"
           defaultValue={data?.username}
           register={register}
           error={errors?.username}
+          placeholder="Choose a username"
+          required
         />
         <InputField
           label="Email"
           name="email"
+          type="email"
           defaultValue={data?.email}
           register={register}
           error={errors?.email}
+          placeholder="pastor@floodoflife.org"
         />
         <InputField
           label="Password"
@@ -88,18 +101,47 @@ const TeacherForm = ({
           defaultValue={data?.password}
           register={register}
           error={errors?.password}
+          placeholder={type === "create" ? "Create password" : "Leave blank to keep current"}
         />
       </div>
-      <span className="text-xs text-gray-400 font-medium">
-        Personal Information
-      </span>
-      <div className="flex justify-between flex-wrap gap-4">
+
+      {/* Personal Information */}
+      <div>
+        <span className="text-xs font-semibold text-purple-600 bg-purple-50 px-2 py-1 rounded">
+          Personal Information
+        </span>
+      </div>
+
+      {/* Photo Upload */}
+      <CldUploadWidget
+        uploadPreset="church"
+        onSuccess={(result, { widget }) => {
+          setImg(result.info);
+          widget.close();
+        }}
+      >
+        {({ open }) => {
+          return (
+            <div
+              className="text-xs text-gray-500 flex items-center gap-2 cursor-pointer hover:text-purple-600 transition-colors"
+              onClick={() => open()}
+            >
+              <Image src="/upload.png" alt="Upload" width={28} height={28} />
+              <span>{img ? "Change photo" : "Upload a profile photo"}</span>
+              {img && <span className="text-green-600">✓ Uploaded</span>}
+            </div>
+          );
+        }}
+      </CldUploadWidget>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <InputField
           label="First Name"
           name="name"
           defaultValue={data?.name}
           register={register}
           error={errors.name}
+          required
         />
         <InputField
           label="Last Name"
@@ -107,6 +149,7 @@ const TeacherForm = ({
           defaultValue={data?.surname}
           register={register}
           error={errors.surname}
+          required
         />
         <InputField
           label="Phone"
@@ -114,6 +157,7 @@ const TeacherForm = ({
           defaultValue={data?.phone}
           register={register}
           error={errors.phone}
+          placeholder="+233 XX XXX XXXX"
         />
         <InputField
           label="Address"
@@ -121,6 +165,7 @@ const TeacherForm = ({
           defaultValue={data?.address}
           register={register}
           error={errors.address}
+          required
         />
         <InputField
           label="Blood Type"
@@ -128,15 +173,63 @@ const TeacherForm = ({
           defaultValue={data?.bloodType}
           register={register}
           error={errors.bloodType}
+          placeholder="e.g., O+, A-"
+          required
         />
         <InputField
           label="Birthday"
           name="birthday"
-          defaultValue={data?.birthday.toISOString().split("T")[0]}
+          defaultValue={data?.birthday?.toISOString().split("T")[0]}
           register={register}
           error={errors.birthday}
           type="date"
+          required
         />
+
+        {/* Gender */}
+        <div className="flex flex-col gap-2 w-full">
+          <label className="text-xs font-medium text-gray-600 flex items-center gap-1">
+            Gender <span className="text-red-500">*</span>
+          </label>
+          <select
+            className="ring-1 ring-gray-300 p-2.5 rounded-md text-sm w-full focus:ring-2 focus:ring-purple-400 outline-none"
+            {...register("gender")}
+            defaultValue={data?.gender}
+          >
+            <option value="">Select gender</option>
+            <option value="MALE">Male</option>
+            <option value="FEMALE">Female</option>
+          </select>
+          {errors.gender?.message && (
+            <p className="text-xs text-red-400">{errors.gender.message.toString()}</p>
+          )}
+        </div>
+
+        {/* Role/Position */}
+        <div className="flex flex-col gap-2 w-full">
+          <label className="text-xs font-medium text-gray-600">Role</label>
+          <select
+            className="ring-1 ring-gray-300 p-2.5 rounded-md text-sm w-full focus:ring-2 focus:ring-purple-400 outline-none"
+            {...register("role")}
+            defaultValue={data?.role || "PASTOR"}
+          >
+            <option value="PASTOR">Pastor</option>
+            <option value="MINISTRY_LEADER">Ministry Leader</option>
+            <option value="CELL_LEADER">Cell Group Leader</option>
+          </select>
+        </div>
+
+        {/* Ordination Date */}
+        <InputField
+          label="Ordination Date"
+          name="ordinationDate"
+          defaultValue={data?.ordinationDate?.toISOString().split("T")[0]}
+          register={register}
+          error={errors.ordinationDate}
+          type="date"
+        />
+
+        {/* Hidden ID for updates */}
         {data && (
           <InputField
             label="Id"
@@ -147,70 +240,71 @@ const TeacherForm = ({
             hidden
           />
         )}
-        <div className="flex flex-col gap-2 w-full md:w-1/4">
-          <label className="text-xs text-gray-500">Sex</label>
-          <select
-            className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
-            {...register("sex")}
-            defaultValue={data?.sex}
-          >
-            <option value="MALE">Male</option>
-            <option value="FEMALE">Female</option>
-          </select>
-          {errors.sex?.message && (
-            <p className="text-xs text-red-400">
-              {errors.sex.message.toString()}
-            </p>
-          )}
-        </div>
-        <div className="flex flex-col gap-2 w-full md:w-1/4">
-          <label className="text-xs text-gray-500">Subjects</label>
+
+        {/* Ministries (multiple select) */}
+        <div className="flex flex-col gap-2 w-full md:col-span-2">
+          <label className="text-xs font-medium text-gray-600 flex items-center gap-1">
+            Ministries
+            <span className="text-gray-400 font-normal text-xs">(Hold Ctrl/Cmd to select multiple)</span>
+          </label>
           <select
             multiple
-            className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
-            {...register("subjects")}
-            defaultValue={data?.subjects}
+            size={4}
+            className="ring-1 ring-gray-300 p-2 rounded-md text-sm w-full focus:ring-2 focus:ring-purple-400 outline-none"
+            {...register("ministryIds")}
+            defaultValue={data?.ministries?.map((m: any) => m.id.toString())}
           >
-            {subjects.map((subject: { id: number; name: string }) => (
-              <option value={subject.id} key={subject.id}>
-                {subject.name}
+            {ministries?.map((ministry: { id: number; name: string }) => (
+              <option value={ministry.id} key={ministry.id} className="py-1">
+                {ministry.name}
               </option>
             ))}
           </select>
-          {errors.subjects?.message && (
-            <p className="text-xs text-red-400">
-              {errors.subjects.message.toString()}
-            </p>
-          )}
         </div>
-        <CldUploadWidget
-          uploadPreset="school"
-          onSuccess={(result, { widget }) => {
-            setImg(result.info);
-            widget.close();
-          }}
-        >
-          {({ open }) => {
-            return (
-              <div
-                className="text-xs text-gray-500 flex items-center gap-2 cursor-pointer"
-                onClick={() => open()}
-              >
-                <Image src="/upload.png" alt="" width={28} height={28} />
-                <span>Upload a photo</span>
-              </div>
-            );
-          }}
-        </CldUploadWidget>
+
+        {/* Cell Groups (multiple select) */}
+        <div className="flex flex-col gap-2 w-full md:col-span-2">
+          <label className="text-xs font-medium text-gray-600 flex items-center gap-1">
+            Cell Groups
+            <span className="text-gray-400 font-normal text-xs">(Hold Ctrl/Cmd to select multiple)</span>
+          </label>
+          <select
+            multiple
+            size={4}
+            className="ring-1 ring-gray-300 p-2 rounded-md text-sm w-full focus:ring-2 focus:ring-purple-400 outline-none"
+            {...register("cellGroupIds")}
+            defaultValue={data?.cellGroups?.map((c: any) => c.id.toString())}
+          >
+            {cellGroups?.map((group: { id: number; name: string }) => (
+              <option value={group.id} key={group.id} className="py-1">
+                {group.name}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
+
+      {/* Pastoral Note */}
+      <div className="bg-purple-50 p-3 rounded-md">
+        <p className="text-xs text-purple-600 flex items-center gap-2">
+          <span>🙏</span>
+          <span>Pastors and leaders are shepherds of God's flock. Their dedication helps the church grow spiritually.</span>
+        </p>
+      </div>
+
       {state.error && (
-        <span className="text-red-500">Something went wrong!</span>
+        <div className="bg-red-50 p-3 rounded-md">
+          <span className="text-sm text-red-500">
+            Something went wrong! Please check all fields and try again.
+          </span>
+        </div>
       )}
-      <button className="bg-blue-400 text-white p-2 rounded-md">
-        {type === "create" ? "Create" : "Update"}
+
+      <button className="bg-purple-600 text-white py-2 px-4 rounded-md hover:bg-purple-700 transition-colors font-medium self-end w-full md:w-auto">
+        {type === "create" ? "Add Pastor" : "Update Pastor"}
       </button>
     </form>
   );
 };
 
-export default TeacherForm;
+export default PastorForm;
